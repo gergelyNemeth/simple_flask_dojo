@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 
 @app.route('/')
-@app.route('/request-counter')
+@app.route('/request-counter', methods=["GET", "POST"])
 def counter():
     return render_template("counter.html")
 

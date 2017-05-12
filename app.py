@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
-counts = 0
+counts = {"GET": 0, "POST": 0, "PUT": 0, "DELETE": 0}
 
 
 @app.route('/')
@@ -10,7 +10,10 @@ counts = 0
 def counter():
     global counts
     if request.url.endswith("/request-counter"):
-        counts += 1
+        if request.method == "GET":
+            counts["GET"] += 1
+        elif request.method == "POST":
+            counts["POST"] += 1
         print(counts)
         return redirect('/')
     return render_template("counter.html")

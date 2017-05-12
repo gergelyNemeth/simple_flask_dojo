@@ -2,23 +2,32 @@ from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
-counts = {"GET": 0, "POST": 0, "PUT": 0, "DELETE": 0}
+
+def read_request_counts():
+    with open("request_counts.txt") as f:
+        request_counts_data = f.readlines()
+        request_counts = []
+        for request_count in request_counts_data:
+            method, count = request_count.split(": ")
+            request_counts.append([method, int(count)])
+        return request_counts
+
+
+def write_request_counts(method):
+    counts = read_request_counts()
+    for count in counts:
+        if count[0] == method:
+            count[1] += 1
+    with open("request_counts.txt", "w") as f:
+        for count in counts:
+            f.write(": ".join([count[0], str(count[1])]) + "\n")
 
 
 @app.route('/')
 @app.route('/request-counter', methods=["GET", "POST", "DELETE", "PUT"])
 def counter():
-    global counts
     if request.url.endswith("/request-counter"):
-        if request.method == "GET":
-            counts["GET"] += 1
-        elif request.method == "POST":
-            counts["POST"] += 1
-        elif request.method == "DELETE":
-            counts["DELETE"] += 1
-        elif request.method == "PUT":
-            counts["PUT"] += 1
-        print(counts)
+        write_request_counts(request.method)
         return redirect('/')
     return render_template("counter.html")
 
